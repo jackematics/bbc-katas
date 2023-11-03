@@ -1,50 +1,65 @@
 import { solvePuzzle } from "./puzzle-solver";
 
 describe("puzzleSolver", () => {
-  it("should solve puzzles", () => {
-    const input = [
-      [1, 2, 3, 4],
-      [5, 0, 6, 8],
-      [9, 10, 7, 11],
-      [13, 14, 15, 12],
-    ];
-
-    const expectedOutput = {
-      movesToSolve: 4,
-      transitionSequence: [
-        [
-          [1, 2, 3, 4],
-          [5, 0, 6, 8],
-          [9, 10, 7, 11],
-          [13, 14, 15, 12],
-        ],
-        [
-          [1, 2, 3, 4],
-          [5, 6, 0, 8],
-          [9, 10, 7, 11],
-          [13, 14, 15, 12],
-        ],
-        [
-          [1, 2, 3, 4],
-          [5, 6, 7, 8],
-          [9, 10, 0, 11],
-          [13, 14, 15, 12],
-        ],
-        [
-          [1, 2, 3, 4],
-          [5, 6, 7, 8],
-          [9, 10, 11, 0],
-          [13, 14, 15, 12],
-        ],
-        [
-          [1, 2, 3, 4],
-          [5, 6, 7, 8],
-          [9, 10, 11, 12],
-          [13, 14, 15, 0],
-        ],
+  it.each([
+    {
+      input: [
+        [5, 8, 6],
+        [3, 4, 1],
+        [2, 7, 0],
       ],
-    };
+      expected: {
+        movesToSolve: 30,
+        steps:
+          "L->U->R->U->L->L->D->R->U->L->D->D->R->R->U->L->L->D->R->R->U->U->L->D->D->R->U->L->D->R",
+      },
+    },
+    {
+      input: [
+        [1, 0, 8],
+        [5, 3, 7],
+        [6, 4, 2],
+      ],
+      expected: {
+        movesToSolve: 37,
+        steps:
+          "D->R->D->L->U->R->U->L->D->D->R->U->L->L->D->R->U->L->D->R->R->L->L->U->R->R->D->L->U->L->D->R->R->U->L->D->R",
+      },
+    },
+    {
+      input: [
+        [6, 7, 2],
+        [1, 4, 5],
+        [8, 3, 0],
+      ],
+      expected: {
+        movesToSolve: 30,
+        steps:
+          "U->U->L->L->D->R->U->R->D->L->D->R->U->L->U->R->D->L->D->L->U->R->R->D->L->U->L->D->R->R",
+      },
+    },
+  ])("should solve 3x3 puzzles", ({ input, expected }) => {
+    const solution = solvePuzzle(input);
+    expect(solution.movesToSolve).toBe(expected.movesToSolve);
+    expect(solution.steps).toBe(expected.steps);
+  });
 
-    expect(solvePuzzle(input)).toStrictEqual(expectedOutput);
+  it.each([
+    {
+      input: [
+        [1, 2, 3, 4],
+        [5, 0, 6, 8],
+        [9, 10, 7, 11],
+        [13, 14, 15, 12],
+      ],
+      expected: {
+        movesToSolve: 4,
+        steps: "R->D->R->D",
+      },
+    },
+  ])("should solve 4x4 puzzles", ({ input, expected }) => {
+    const solution = solvePuzzle(input);
+    expect(solution.movesToSolve).toBe(expected.movesToSolve);
+    expect(solution.steps).toBe(expected.steps);
   });
 });

@@ -1,9 +1,10 @@
 type Solution = {
   movesToSolve: number;
   transitionSequence: number[][][];
+  steps: string;
 };
 
-type GridIndex = {
+type TileIndex = {
   row: number;
   col: number;
 };
@@ -22,6 +23,11 @@ type PermutationNode = {
   steps: string[];
 };
 
+type TileData = {
+  direction: Direction;
+  tileIndex: TileIndex | undefined;
+};
+
 export const solvePuzzle = (input: number[][]): Solution => {
   const finalSolvedPuzzle = createSolvedPuzzle(input.length, input[0].length);
   const expectedSolvedPuzzle = createSolvedPuzzle(
@@ -31,13 +37,19 @@ export const solvePuzzle = (input: number[][]): Solution => {
 
   let currentPermutation = input;
   const steps: string[] = [];
+
   while (
     JSON.stringify(
       affixSolvedRowsAndColumns(currentPermutation, finalSolvedPuzzle)
     ) !== JSON.stringify(finalSolvedPuzzle)
   ) {
+    const topLeftValue = expectedSolvedPuzzle[0][0];
+    const topLeftSolved = solveTopLeftValue(topLeftValue, currentPermutation);
+
+    steps.push(...topLeftSolved.steps);
+
     const partialSolvedPuzzle = solveForTopOrLeft(
-      currentPermutation,
+      topLeftSolved.permutation,
       expectedSolvedPuzzle
     );
 
@@ -50,6 +62,7 @@ export const solvePuzzle = (input: number[][]): Solution => {
   return {
     movesToSolve: transitionSequence.length - 1,
     transitionSequence,
+    steps: steps.join("->"),
   };
 };
 
@@ -66,12 +79,132 @@ const createSolvedPuzzle = (rowDim: number, colDim: number): number[][] => {
   return solvedPuzzle;
 };
 
+const solveTopLeftValue = (
+  topLeftValue: number,
+  puzzle: number[][]
+): PermutationNode => {
+  let updatedPuzzle = JSON.parse(JSON.stringify(puzzle));
+  const steps: string[] = [];
+
+  while (updatedPuzzle[0][0] !== topLeftValue) {
+    const currentTopLeftValueIndex = getTileIndex(topLeftValue, updatedPuzzle);
+    const distanceToTopLeft = getTileDistance(currentTopLeftValueIndex, {
+      row: 0,
+      col: 0,
+    });
+    const nextTopLeftTileIndex =
+      distanceToTopLeft.row >= distanceToTopLeft.col
+        ? {
+            row: currentTopLeftValueIndex.row,
+            col: currentTopLeftValueIndex.col - 1,
+          }
+        : {
+            row: currentTopLeftValueIndex.row - 1,
+            col: currentTopLeftValueIndex.col,
+          };
+
+    const forbiddenTileIndexes = [currentTopLeftValueIndex];
+    while (
+      updatedPuzzle[nextTopLeftTileIndex.row][nextTopLeftTileIndex.col] !==
+      topLeftValue
+    ) {
+      const zeroTileIndex = getTileIndex(0, updatedPuzzle);
+      const neighbouringTileData = getNeighbouringTileData(
+        zeroTileIndex,
+        updatedPuzzle
+      ).filter((tileData) => tileData.tileIndex);
+      const weightAttached = sortTileDataByWeight(
+        zeroTileIndex,
+        neighbouringTileData,
+        nextTopLeftTileIndex,
+        forbiddenTileIndexes
+      );
+
+      if (
+        zeroTileIndex.row === nextTopLeftTileIndex.row &&
+        zeroTileIndex.col === nextTopLeftTileIndex.col
+      ) {
+        updatedPuzzle = swapTile(
+          updatedPuzzle,
+          zeroTileIndex,
+          currentTopLeftValueIndex
+        );
+
+        steps.push(
+          zeroTileIndex.row < currentTopLeftValueIndex.row ? "D" : "R"
+        );
+      } else {
+        updatedPuzzle = swapTile(
+          updatedPuzzle,
+          zeroTileIndex,
+          weightAttached[0].tileIndex!
+        );
+        steps.push(weightAttached[0].direction);
+        forbiddenTileIndexes.push(zeroTileIndex);
+      }
+    }
+  }
+
+  return { permutation: updatedPuzzle, steps };
+};
+
+const getTileDistance = (tileA: TileIndex, tileB: TileIndex): TileIndex => ({
+  row: tileB.row - tileA.row,
+  col: tileB.col - tileA.col,
+});
+
+const sortTileDataByWeight = (
+  zeroTileIndex: TileIndex,
+  tileDataList: TileData[],
+  destinationTileIndex: TileIndex,
+  forbiddenTileIndexes?: TileIndex[]
+) => {
+  return tileDataList
+    .map((tileData) => {
+      if (
+        forbiddenTileIndexes?.find(
+          (forbiddenTile) =>
+            tileData.tileIndex?.row === forbiddenTile.row &&
+            tileData.tileIndex?.col === forbiddenTile.col
+        )
+      ) {
+        return { ...tileData, weight: 2 };
+      }
+
+      if (
+        getTileAbsoluteDistance(tileData.tileIndex!, destinationTileIndex) <
+        getTileAbsoluteDistance(zeroTileIndex, destinationTileIndex)
+      ) {
+        return {
+          ...tileData,
+          weight: 0,
+        };
+      } else {
+        return {
+          ...tileData,
+          weight: 1,
+        };
+      }
+    })
+    .sort((a, b) => a.weight - b.weight);
+};
+
+const getTileAbsoluteDistance = (tileA: TileIndex, tileB: TileIndex) =>
+  Math.sqrt(
+    Math.pow(tileB.row - tileA.row, 2) + Math.pow(tileB.col - tileA.col, 2)
+  );
+
 const solveForTopOrLeft = (
   permutation: number[][],
   expectedSolvedPuzzle: number[][]
 ): PermutationNode => {
+  if (JSON.stringify(permutation) === JSON.stringify(expectedSolvedPuzzle)) {
+    return { permutation, steps: [] };
+  }
+
   const queue: PermutationNode[] = [{ permutation, steps: [] }];
 
+  let previousTileIndex = { row: 0, col: 0 };
   while (queue.length !== 0) {
     const node = queue.shift() as PermutationNode;
 
@@ -94,21 +227,28 @@ const solveForTopOrLeft = (
     const neighbouringTileData = getNeighbouringTileData(
       emptyTileIndex,
       node.permutation
-    );
+    )
+      .filter((tileData) => tileData.tileIndex)
+      .filter(
+        (tileData) =>
+          JSON.stringify(tileData.tileIndex) !==
+          JSON.stringify(previousTileIndex)
+      );
 
     const newPermutations = neighbouringTileData.map((tileData) => ({
       permutation: swapTile(
         node.permutation,
         emptyTileIndex,
-        tileData.tileIndex as GridIndex
+        tileData.tileIndex as TileIndex
       ),
       steps: [...node.steps, tileData.direction],
     }));
+    previousTileIndex = emptyTileIndex;
 
     queue.push(...newPermutations);
   }
 
-  throw Error("Top or left unsolvable!");
+  throw Error("This should never throw!");
 };
 
 const topSolved = (
@@ -128,9 +268,9 @@ const leftSolved = (input: number[][], expectedPuzzle: number[][]): boolean => {
     .every((val, index) => val === leftExpected[index]);
 };
 
-const getTileIndex = (value: number, grid: number[][]): GridIndex => {
-  const tileRow = grid.findIndex((row) => row.includes(value));
-  const tileCol = grid[tileRow].findIndex((colVal) => colVal === value);
+const getTileIndex = (value: number, puzzle: number[][]): TileIndex => {
+  const tileRow = puzzle.findIndex((row) => row.includes(value));
+  const tileCol = puzzle[tileRow].findIndex((colVal) => colVal === value);
 
   return {
     row: tileRow,
@@ -139,9 +279,9 @@ const getTileIndex = (value: number, grid: number[][]): GridIndex => {
 };
 
 const getNeighbouringTileData = (
-  centreTileIndex: GridIndex,
+  centreTileIndex: TileIndex,
   permutation: number[][]
-) => {
+): TileData[] => {
   return [
     {
       direction: Direction.Up,
@@ -171,24 +311,27 @@ const getNeighbouringTileData = (
         permutation
       ),
     },
-  ].filter((tileData) => tileData.tileIndex);
+  ];
 };
 
 const getNeighbouringTileIndex = (
-  tileIndex: GridIndex,
+  tileIndex: TileIndex,
   delta: number[],
-  grid: number[][]
-): GridIndex | undefined => {
+  puzzle: number[][]
+): TileIndex | undefined => {
   try {
     const newIndex = {
       row: tileIndex.row + delta[0],
       col: tileIndex.col + delta[1],
     };
-    grid[newIndex.row][newIndex.col];
-    return {
-      row: tileIndex.row + delta[0],
-      col: tileIndex.col + delta[1],
-    };
+    if (puzzle[newIndex.row][newIndex.col]) {
+      return {
+        row: tileIndex.row + delta[0],
+        col: tileIndex.col + delta[1],
+      };
+    }
+
+    return undefined;
   } catch {
     return undefined;
   }
@@ -196,8 +339,8 @@ const getNeighbouringTileIndex = (
 
 const swapTile = (
   permutation: number[][],
-  tileAIndex: GridIndex,
-  tileBIndex: GridIndex
+  tileAIndex: TileIndex,
+  tileBIndex: TileIndex
 ): number[][] => {
   const newPermutation = JSON.parse(JSON.stringify(permutation));
   const tileA = permutation[tileAIndex.row][tileAIndex.col];
@@ -257,7 +400,7 @@ const getTransitionSequence = (
       zeroTileIndex,
       direction[step],
       currentPermutation
-    ) as GridIndex;
+    ) as TileIndex;
     const permutationAfterSwap = swapTile(
       currentPermutation,
       zeroTileIndex,
