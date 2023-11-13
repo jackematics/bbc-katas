@@ -23,7 +23,7 @@ describe("puzzleSolver", () => {
       expected: {
         movesToSolve: 37,
         steps:
-          "D->R->D->L->U->R->U->L->D->D->R->U->L->L->D->R->U->L->D->R->R->L->L->U->R->R->D->L->U->L->D->R->R->U->L->D->R",
+          "D->R->D->L->U->R->U->L->D->D->R->U->L->L->D->R->U->L->D->R->R->U->L->D->L->U->R->D->R->U->L->L->D->R->U->R->D",
       },
     },
     {
@@ -57,6 +57,18 @@ describe("puzzleSolver", () => {
         steps: "R->D->R->D",
       },
     },
+    // {
+    //   input: [
+    //     [14, 15, 8, 11],
+    //     [4, 12, 1, 3],
+    //     [10, 5, 6, 2],
+    //     [7, 13, 9, 0],
+    //   ],
+    //   expected: {
+    //     movesToSolve: 4,
+    //     steps: "R->D->R->D",
+    //   },
+    // },
   ])("should solve 4x4 puzzles", ({ input, expected }) => {
     const solution = solvePuzzle(input);
     expect(solution.movesToSolve).toBe(expected.movesToSolve);

@@ -1,9 +1,10 @@
+import { off } from "process";
 import {
-  getTileIndex,
-  getTileDistance,
-  getNeighbouringTileData,
-  getTileAbsoluteDistance,
-  getNeighbouringTileIndex,
+  calculateTileDistance,
+  calculateTileAbsoluteDistance,
+  findTileIndex,
+  findNeighbouringTileData,
+  findNeighbouringTileIndex,
   Direction,
   TileData,
   TileIndex,
@@ -79,8 +80,8 @@ const solveTopLeftValue = (
   const steps: string[] = [];
 
   while (updatedPuzzle[0][0] !== topLeftValue) {
-    const currentTopLeftValueIndex = getTileIndex(topLeftValue, updatedPuzzle);
-    const distanceToTopLeft = getTileDistance(currentTopLeftValueIndex, {
+    const currentTopLeftValueIndex = findTileIndex(topLeftValue, updatedPuzzle);
+    const distanceToTopLeft = calculateTileDistance(currentTopLeftValueIndex, {
       row: 0,
       col: 0,
     });
@@ -100,14 +101,14 @@ const solveTopLeftValue = (
       updatedPuzzle[nextTopLeftTileIndex.row][nextTopLeftTileIndex.col] !==
       topLeftValue
     ) {
-      const zeroTileIndex = getTileIndex(0, updatedPuzzle);
-      const neighbouringTileData = getNeighbouringTileData(
+      const zeroTileIndex = findTileIndex(0, updatedPuzzle);
+      const neighbouringTileData = findNeighbouringTileData(
         zeroTileIndex,
         updatedPuzzle
       ).filter((tileData) => tileData.tileIndex);
       const weightAttached = sortTileDataByWeight(
-        zeroTileIndex,
         neighbouringTileData,
+        zeroTileIndex,
         nextTopLeftTileIndex,
         forbiddenTileIndexes
       );
@@ -141,8 +142,8 @@ const solveTopLeftValue = (
 };
 
 const sortTileDataByWeight = (
-  zeroTileIndex: TileIndex,
   tileDataList: TileData[],
+  zeroTileIndex: TileIndex,
   destinationTileIndex: TileIndex,
   forbiddenTileIndexes?: TileIndex[]
 ) => {
@@ -159,8 +160,10 @@ const sortTileDataByWeight = (
       }
 
       if (
-        getTileAbsoluteDistance(tileData.tileIndex!, destinationTileIndex) <
-        getTileAbsoluteDistance(zeroTileIndex, destinationTileIndex)
+        calculateTileAbsoluteDistance(
+          tileData.tileIndex!,
+          destinationTileIndex
+        ) < calculateTileAbsoluteDistance(zeroTileIndex, destinationTileIndex)
       ) {
         return {
           ...tileData,
@@ -184,6 +187,7 @@ const solveForTopOrLeft = (
     return { permutation, steps: [] };
   }
 
+  const visited: number[][][] = [permutation];
   const queue: PermutationNode[] = [{ permutation, steps: [] }];
 
   let previousTileIndex = { row: 0, col: 0 };
@@ -204,9 +208,9 @@ const solveForTopOrLeft = (
       return node;
     }
 
-    const emptyTileIndex = getTileIndex(0, node.permutation);
+    const emptyTileIndex = findTileIndex(0, node.permutation);
 
-    const neighbouringTileData = getNeighbouringTileData(
+    const neighbouringTileData = findNeighbouringTileData(
       emptyTileIndex,
       node.permutation
     )
@@ -217,17 +221,31 @@ const solveForTopOrLeft = (
           JSON.stringify(previousTileIndex)
       );
 
-    const newPermutations = neighbouringTileData.map((tileData) => ({
-      permutation: swapTile(
-        node.permutation,
-        emptyTileIndex,
-        tileData.tileIndex as TileIndex
-      ),
-      steps: [...node.steps, tileData.direction],
-    }));
+    const newPermutationNodes = neighbouringTileData
+      .map((tileData) => ({
+        permutation: swapTile(
+          node.permutation,
+          emptyTileIndex,
+          tileData.tileIndex as TileIndex
+        ),
+        steps: [...node.steps, tileData.direction],
+      }))
+      .filter((permutationNode) => {
+        for (let i = 0; i < visited.length; i++) {
+          if (
+            JSON.stringify(visited[i]) ===
+            JSON.stringify(permutationNode.permutation)
+          ) {
+            return false;
+          }
+        }
+        return true;
+      });
+
     previousTileIndex = emptyTileIndex;
 
-    queue.push(...newPermutations);
+    queue.push(...newPermutationNodes);
+    visited.push(node.permutation);
   }
 
   throw Error("This should never throw!");
@@ -308,8 +326,8 @@ const getTransitionSequence = (
 
   let currentPermutation = input;
   steps.forEach((step) => {
-    const zeroTileIndex = getTileIndex(0, currentPermutation);
-    const neighbouringTileIndex = getNeighbouringTileIndex(
+    const zeroTileIndex = findTileIndex(0, currentPermutation);
+    const neighbouringTileIndex = findNeighbouringTileIndex(
       zeroTileIndex,
       direction[step],
       currentPermutation

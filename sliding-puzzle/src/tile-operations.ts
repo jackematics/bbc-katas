@@ -17,17 +17,20 @@ const Direction = {
 
 type Direction = (typeof Direction)[keyof typeof Direction];
 
-const getTileDistance = (tileA: TileIndex, tileB: TileIndex): TileIndex => ({
+const calculateTileDistance = (
+  tileA: TileIndex,
+  tileB: TileIndex
+): TileIndex => ({
   row: tileB.row - tileA.row,
   col: tileB.col - tileA.col,
 });
 
-const getTileAbsoluteDistance = (tileA: TileIndex, tileB: TileIndex) =>
+const calculateTileAbsoluteDistance = (tileA: TileIndex, tileB: TileIndex) =>
   Math.sqrt(
     Math.pow(tileB.row - tileA.row, 2) + Math.pow(tileB.col - tileA.col, 2)
   );
 
-const getTileIndex = (value: number, puzzle: number[][]): TileIndex => {
+const findTileIndex = (value: number, puzzle: number[][]): TileIndex => {
   const tileRow = puzzle.findIndex((row) => row.includes(value));
   const tileCol = puzzle[tileRow].findIndex((colVal) => colVal === value);
 
@@ -37,31 +40,31 @@ const getTileIndex = (value: number, puzzle: number[][]): TileIndex => {
   };
 };
 
-const getNeighbouringTileData = (
+const findNeighbouringTileData = (
   centreTileIndex: TileIndex,
   puzzle: number[][]
 ): TileData[] => {
   return [
     {
       direction: Direction.Up,
-      tileIndex: getNeighbouringTileIndex(centreTileIndex, [-1, 0], puzzle),
+      tileIndex: findNeighbouringTileIndex(centreTileIndex, [-1, 0], puzzle),
     },
     {
       direction: Direction.Right,
-      tileIndex: getNeighbouringTileIndex(centreTileIndex, [0, +1], puzzle),
+      tileIndex: findNeighbouringTileIndex(centreTileIndex, [0, +1], puzzle),
     },
     {
       direction: Direction.Down,
-      tileIndex: getNeighbouringTileIndex(centreTileIndex, [1, 0], puzzle),
+      tileIndex: findNeighbouringTileIndex(centreTileIndex, [1, 0], puzzle),
     },
     {
       direction: Direction.Left,
-      tileIndex: getNeighbouringTileIndex(centreTileIndex, [0, -1], puzzle),
+      tileIndex: findNeighbouringTileIndex(centreTileIndex, [0, -1], puzzle),
     },
   ];
 };
 
-const getNeighbouringTileIndex = (
+const findNeighbouringTileIndex = (
   tileIndex: TileIndex,
   delta: number[],
   puzzle: number[][]
@@ -88,9 +91,9 @@ export {
   TileIndex,
   TileData,
   Direction,
-  getTileDistance,
-  getTileAbsoluteDistance,
-  getTileIndex,
-  getNeighbouringTileData,
-  getNeighbouringTileIndex,
+  calculateTileDistance,
+  calculateTileAbsoluteDistance,
+  findTileIndex,
+  findNeighbouringTileData,
+  findNeighbouringTileIndex,
 };
