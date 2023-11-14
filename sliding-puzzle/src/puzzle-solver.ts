@@ -8,7 +8,9 @@ import {
   Direction,
   TileData,
   TileIndex,
+  tilesEqual,
 } from "./tile-operations";
+import { puzzlesEqual } from "./puzzle-operations";
 
 type Solution = {
   movesToSolve: number;
@@ -32,9 +34,10 @@ export const solvePuzzle = (input: number[][]): Solution => {
   const steps: string[] = [];
 
   while (
-    JSON.stringify(
-      affixSolvedRowsAndColumns(currentPermutation, finalSolvedPuzzle)
-    ) !== JSON.stringify(finalSolvedPuzzle)
+    !puzzlesEqual(
+      affixSolvedRowsAndColumns(currentPermutation, finalSolvedPuzzle),
+      finalSolvedPuzzle
+    )
   ) {
     const topLeftValue = expectedSolvedPuzzle[0][0];
     const topLeftSolved = solveTopLeftValue(topLeftValue, currentPermutation);
@@ -216,9 +219,7 @@ const solveForTopOrLeft = (
     )
       .filter((tileData) => tileData.tileIndex)
       .filter(
-        (tileData) =>
-          JSON.stringify(tileData.tileIndex) !==
-          JSON.stringify(previousTileIndex)
+        (tileData) => !tilesEqual(tileData.tileIndex!, previousTileIndex)
       );
 
     const newPermutationNodes = neighbouringTileData
@@ -232,10 +233,7 @@ const solveForTopOrLeft = (
       }))
       .filter((permutationNode) => {
         for (let i = 0; i < visited.length; i++) {
-          if (
-            JSON.stringify(visited[i]) ===
-            JSON.stringify(permutationNode.permutation)
-          ) {
+          if (puzzlesEqual(visited[i], permutationNode.permutation)) {
             return false;
           }
         }

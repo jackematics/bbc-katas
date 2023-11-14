@@ -87,6 +87,10 @@ const findNeighbouringTileIndex = (
   }
 };
 
+const tilesEqual = (tileA: TileIndex, tileB: TileIndex): boolean => {
+  return tileA.row === tileB.row && tileA.col === tileB.col;
+};
+
 export {
   TileIndex,
   TileData,
@@ -96,4 +100,5 @@ export {
   findTileIndex,
   findNeighbouringTileData,
   findNeighbouringTileIndex,
+  tilesEqual,
 };
