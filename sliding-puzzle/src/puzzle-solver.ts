@@ -10,7 +10,7 @@ import {
   TileIndex,
   tilesEqual,
 } from "./tile-operations";
-import { puzzlesEqual } from "./puzzle-operations";
+import { copyPuzzle, puzzlesEqual } from "./puzzle-operations";
 
 type Solution = {
   movesToSolve: number;
@@ -79,7 +79,7 @@ const solveTopLeftValue = (
   topLeftValue: number,
   puzzle: number[][]
 ): PermutationNode => {
-  let updatedPuzzle = JSON.parse(JSON.stringify(puzzle));
+  let updatedPuzzle = copyPuzzle(puzzle);
   const steps: string[] = [];
 
   while (updatedPuzzle[0][0] !== topLeftValue) {
@@ -186,7 +186,7 @@ const solveForTopOrLeft = (
   permutation: number[][],
   expectedSolvedPuzzle: number[][]
 ): PermutationNode => {
-  if (JSON.stringify(permutation) === JSON.stringify(expectedSolvedPuzzle)) {
+  if (puzzlesEqual(permutation, expectedSolvedPuzzle)) {
     return { permutation, steps: [] };
   }
 
@@ -271,7 +271,7 @@ const swapTile = (
   tileAIndex: TileIndex,
   tileBIndex: TileIndex
 ): number[][] => {
-  const newPermutation = JSON.parse(JSON.stringify(permutation));
+  const newPermutation = copyPuzzle(permutation);
   const tileA = permutation[tileAIndex.row][tileAIndex.col];
   const tileB = permutation[tileBIndex.row][tileBIndex.col];
 
