@@ -1,16 +1,18 @@
-import { off } from "process";
 import {
   calculateTileDistance,
   calculateTileAbsoluteDistance,
   findTileIndex,
-  findNeighbouringTileData,
-  findNeighbouringTileIndex,
   Direction,
   TileData,
   TileIndex,
   tilesEqual,
 } from "./tile-operations";
-import { copyPuzzle, puzzlesEqual } from "./puzzle-operations";
+import {
+  copyPuzzle,
+  findNeighbouringTileData,
+  findNeighbouringTileIndex,
+  puzzlesEqual,
+} from "./puzzle-operations";
 
 type Solution = {
   movesToSolve: number;
