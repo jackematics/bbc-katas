@@ -224,7 +224,7 @@ const solveForTopOrLeft = (
         (tileData) => !tilesEqual(tileData.tileIndex!, previousTileIndex)
       );
 
-    const newPermutationNodes = neighbouringTileData
+    const neighbouringPermutationNodes = neighbouringTileData
       .map((tileData) => ({
         permutation: swapTile(
           node.permutation,
@@ -244,7 +244,7 @@ const solveForTopOrLeft = (
 
     previousTileIndex = emptyTileIndex;
 
-    queue.push(...newPermutationNodes);
+    queue.push(...neighbouringPermutationNodes);
     visited.push(node.permutation);
   }
 
