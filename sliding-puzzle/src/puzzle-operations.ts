@@ -1,4 +1,22 @@
-import { TileIndex, TileData, Direction, tilesEqual } from "./tile-operations";
+import {
+  TileIndex,
+  TileData,
+  Direction,
+  findTileIndex,
+} from "./tile-operations";
+
+const createSolvedPuzzle = (rowDim: number, colDim: number): number[][] => {
+  const solvedPuzzle: number[][] = [];
+  for (let row = 0; row < rowDim; row++) {
+    solvedPuzzle.push([]);
+    for (let col = 1; col <= colDim; col++) {
+      solvedPuzzle[row].push(col + row * solvedPuzzle[0].length);
+    }
+  }
+  solvedPuzzle[rowDim - 1][colDim - 1] = 0;
+
+  return solvedPuzzle;
+};
 
 const puzzlesEqual = (puzzleA: number[][], puzzleB: number[][]): boolean => {
   if (
@@ -79,9 +97,28 @@ const findNeighbouringTileIndex = (
   }
 };
 
+const totalManhattanDistance = (
+  puzzle: number[][],
+  solvedPuzzle: number[][]
+) => {
+  let totalManhattanDistance = 0;
+
+  for (let row = 0; row < puzzle.length; row++) {
+    for (let col = 0; col < puzzle[0].length; col++) {
+      const solvedIndex = findTileIndex(puzzle[row][col], solvedPuzzle);
+      totalManhattanDistance +=
+        Math.abs(row - solvedIndex.row) + Math.abs(col - solvedIndex.col);
+    }
+  }
+
+  return totalManhattanDistance;
+};
+
 export {
-  puzzlesEqual,
   copyPuzzle,
+  createSolvedPuzzle,
   findNeighbouringTileData,
   findNeighbouringTileIndex,
+  puzzlesEqual,
+  totalManhattanDistance,
 };

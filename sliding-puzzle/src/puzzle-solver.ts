@@ -9,9 +9,11 @@ import {
 } from "./tile-operations";
 import {
   copyPuzzle,
+  createSolvedPuzzle,
   findNeighbouringTileData,
   findNeighbouringTileIndex,
   puzzlesEqual,
+  totalManhattanDistance,
 } from "./puzzle-operations";
 
 type Solution = {
@@ -23,6 +25,7 @@ type Solution = {
 type PermutationNode = {
   permutation: number[][];
   steps: string[];
+  manhattanDistance: number;
 };
 
 export const solvePuzzle = (input: number[][]): Solution => {
@@ -42,7 +45,11 @@ export const solvePuzzle = (input: number[][]): Solution => {
     )
   ) {
     const topLeftValue = expectedSolvedPuzzle[0][0];
-    const topLeftSolved = solveTopLeftValue(topLeftValue, currentPermutation);
+    const topLeftSolved = solveTopLeftValue(
+      topLeftValue,
+      currentPermutation,
+      expectedSolvedPuzzle
+    );
 
     steps.push(...topLeftSolved.steps);
 
@@ -64,22 +71,10 @@ export const solvePuzzle = (input: number[][]): Solution => {
   };
 };
 
-const createSolvedPuzzle = (rowDim: number, colDim: number): number[][] => {
-  const solvedPuzzle: number[][] = [];
-  for (let row = 0; row < rowDim; row++) {
-    solvedPuzzle.push([]);
-    for (let col = 1; col <= colDim; col++) {
-      solvedPuzzle[row].push(col + row * solvedPuzzle[0].length);
-    }
-  }
-  solvedPuzzle[rowDim - 1][colDim - 1] = 0;
-
-  return solvedPuzzle;
-};
-
 const solveTopLeftValue = (
   topLeftValue: number,
-  puzzle: number[][]
+  puzzle: number[][],
+  solvedPuzzle: number[][]
 ): PermutationNode => {
   let updatedPuzzle = copyPuzzle(puzzle);
   const steps: string[] = [];
@@ -143,7 +138,11 @@ const solveTopLeftValue = (
     }
   }
 
-  return { permutation: updatedPuzzle, steps };
+  return {
+    permutation: updatedPuzzle,
+    steps,
+    manhattanDistance: totalManhattanDistance(updatedPuzzle, solvedPuzzle),
+  };
 };
 
 const sortTileDataByWeight = (
@@ -185,18 +184,31 @@ const sortTileDataByWeight = (
 };
 
 const solveForTopOrLeft = (
-  permutation: number[][],
+  puzzle: number[][],
   expectedSolvedPuzzle: number[][]
 ): PermutationNode => {
-  if (puzzlesEqual(permutation, expectedSolvedPuzzle)) {
-    return { permutation, steps: [] };
+  if (puzzlesEqual(puzzle, expectedSolvedPuzzle)) {
+    return { permutation: puzzle, steps: [], manhattanDistance: 0 };
   }
 
-  const visited: number[][][] = [permutation];
-  const queue: PermutationNode[] = [{ permutation, steps: [] }];
+  const visited: number[][][] = [puzzle];
+  let queue: PermutationNode[] = [
+    {
+      permutation: puzzle,
+      steps: [],
+      manhattanDistance: totalManhattanDistance(puzzle, expectedSolvedPuzzle),
+    },
+  ];
 
   let previousTileIndex = { row: 0, col: 0 };
   while (queue.length !== 0) {
+    if (queue.length > 15000) {
+      queue = queue.filter(
+        (node) =>
+          node.manhattanDistance < calculateAverageManhattanDistance(queue)
+      );
+    }
+
     const node = queue.shift() as PermutationNode;
 
     if (topSolved(node.permutation, expectedSolvedPuzzle)) {
@@ -232,6 +244,10 @@ const solveForTopOrLeft = (
           tileData.tileIndex as TileIndex
         ),
         steps: [...node.steps, tileData.direction],
+        manhattanDistance: totalManhattanDistance(
+          node.permutation,
+          expectedSolvedPuzzle
+        ),
       }))
       .filter((permutationNode) => {
         for (let i = 0; i < visited.length; i++) {
@@ -281,6 +297,17 @@ const swapTile = (
   newPermutation[tileBIndex.row][tileBIndex.col] = tileA;
 
   return newPermutation;
+};
+
+const calculateAverageManhattanDistance = (
+  puzzleNodes: PermutationNode[]
+): number => {
+  let total = 0;
+  for (let i = 0; i < puzzleNodes.length; i++) {
+    total += puzzleNodes[i].manhattanDistance;
+  }
+
+  return Math.ceil(total / puzzleNodes.length);
 };
 
 const affixSolvedRowsAndColumns = (

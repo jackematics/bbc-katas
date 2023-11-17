@@ -89,6 +89,32 @@ describe("puzzleSolver", () => {
           "U->U->U->L->L->D->R->U->L->L->D->R->U->L->D->D->R->D->R->U->U->L->L->D->R->D->L->U->R->R->R->D->L->U->R->U->L->D->L->U->R->U->L->D->R->D->D->R->U->U->L->D->R->U->U->L->D->D->D->L->U->R->U->L->D->R->U->R->D->L->D->R->U->U->L->D->L->D->R->R->U->L->D->L->U->R->R->D->L->U->L->D->R->R->U->L->D->R",
       },
     },
+    {
+      input: [
+        [5, 14, 1, 7],
+        [15, 8, 6, 4],
+        [12, 13, 10, 11],
+        [3, 2, 9, 0],
+      ],
+      expected: {
+        movesToSolve: 90,
+        steps:
+          "U->U->U->D->L->L->U->R->R->D->L->L->L->U->R->R->D->D->D->L->L->U->R->R->D->L->L->U->R->U->R->D->L->U->R->U->L->D->R->R->D->L->D->L->U->U->R->R->U->L->D->D->R->U->U->L->D->D->R->U->L->L->D->R->U->L->D->D->R->U->U->L->D->R->D->L->U->U->R->D->R->U->L->D->D->R->U->L->D->R",
+      },
+    },
+    {
+      input: [
+        [2, 13, 9, 7],
+        [3, 8, 15, 4],
+        [6, 1, 5, 14],
+        [10, 12, 11, 0],
+      ],
+      expected: {
+        movesToSolve: 86,
+        steps:
+          "U->U->L->L->D->L->U->R->U->L->D->R->R->U->L->D->R->D->L->L->U->R->R->D->D->L->L->U->U->R->U->R->R->D->D->L->D->R->U->L->L->U->R->D->L->D->R->U->R->U->U->L->D->D->R->U->U->L->D->D->R->U->L->U->R->D->L->D->R->U->L->D->R->U->L->D->D->R->U->L->U->R->D->L->D->R",
+      },
+    },
   ])("should solve 4x4 puzzles", ({ input, expected }) => {
     const solution = solvePuzzle(input);
     expect(solution.movesToSolve).toBe(expected.movesToSolve);
