@@ -1,4 +1,4 @@
-import { solvePuzzle } from "./puzzle-solver";
+import { Solution, UnsolvableResult, solvePuzzle } from "./puzzle-solver";
 
 describe("puzzleSolver", () => {
   it.each([
@@ -39,7 +39,7 @@ describe("puzzleSolver", () => {
       },
     },
   ])("should solve 3x3 puzzles", ({ input, expected }) => {
-    const solution = solvePuzzle(input);
+    const solution = solvePuzzle(input) as Solution;
     expect(solution.movesToSolve).toBe(expected.movesToSolve);
     expect(solution.steps).toBe(expected.steps);
   });
@@ -58,7 +58,7 @@ describe("puzzleSolver", () => {
       },
     },
   ])("should solve 4x3 puzzles", ({ input, expected }) => {
-    const solution = solvePuzzle(input);
+    const solution = solvePuzzle(input) as Solution;
     expect(solution.movesToSolve).toBe(expected.movesToSolve);
     expect(solution.steps).toBe(expected.steps);
   });
@@ -116,8 +116,36 @@ describe("puzzleSolver", () => {
       },
     },
   ])("should solve 4x4 puzzles", ({ input, expected }) => {
-    const solution = solvePuzzle(input);
+    const solution = solvePuzzle(input) as Solution;
     expect(solution.movesToSolve).toBe(expected.movesToSolve);
     expect(solution.steps).toBe(expected.steps);
+  });
+
+  it.each([
+    {
+      input: [
+        [8, 1, 2],
+        [0, 4, 3],
+        [7, 6, 5],
+      ],
+    },
+    {
+      input: [
+        [2, 1, 3],
+        [4, 5, 6],
+        [7, 8, 0],
+      ],
+    },
+    {
+      input: [
+        [1, 2, 3, 4],
+        [5, 6, 7, 8],
+        [9, 10, 11, 12],
+        [13, 15, 14, 0],
+      ],
+    },
+  ])("should ignore unsolvable puzzles", ({ input }) => {
+    const expected = solvePuzzle(input) as UnsolvableResult;
+    expect(expected.message).toBe("Error: unsolvable puzzle");
   });
 });

@@ -106,15 +106,28 @@ const totalManhattanDistance = (
   for (let row = 0; row < puzzle.length; row++) {
     for (let col = 0; col < puzzle[0].length; col++) {
       const solvedIndex = findTileIndex(puzzle[row][col], solvedPuzzle);
-      totalManhattanDistance +=
-        Math.abs(row - solvedIndex.row) + Math.abs(col - solvedIndex.col);
+      totalManhattanDistance += calculateManhattanDistance(
+        { row, col },
+        solvedIndex
+      );
     }
   }
 
   return totalManhattanDistance;
 };
 
+const calculateManhattanDistance = (
+  index: TileIndex,
+  solvedIndex: TileIndex
+) => {
+  return (
+    Math.abs(index.row - solvedIndex.row) +
+    Math.abs(index.col - solvedIndex.col)
+  );
+};
+
 export {
+  calculateManhattanDistance,
   copyPuzzle,
   createSolvedPuzzle,
   findNeighbouringTileData,

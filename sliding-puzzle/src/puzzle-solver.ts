@@ -15,11 +15,16 @@ import {
   puzzlesEqual,
   totalManhattanDistance,
 } from "./puzzle-operations";
+import { puzzleSolvable } from "./puzzle-validator";
 
-type Solution = {
+export type Solution = {
   movesToSolve: number;
   transitionSequence: number[][][];
   steps: string;
+};
+
+export type UnsolvableResult = {
+  message: string;
 };
 
 type PermutationNode = {
@@ -28,14 +33,20 @@ type PermutationNode = {
   manhattanDistance: number;
 };
 
-export const solvePuzzle = (input: number[][]): Solution => {
-  const finalSolvedPuzzle = createSolvedPuzzle(input.length, input[0].length);
-  const expectedSolvedPuzzle = createSolvedPuzzle(
-    input.length,
-    input[0].length
+export const solvePuzzle = (
+  puzzle: number[][]
+): Solution | UnsolvableResult => {
+  if (!puzzleSolvable(puzzle)) {
+    return { message: "Error: unsolvable puzzle" };
+  }
+
+  const finalSolvedPuzzle = createSolvedPuzzle(puzzle.length, puzzle[0].length);
+  const mutatingSolvedPuzzle = createSolvedPuzzle(
+    puzzle.length,
+    puzzle[0].length
   );
 
-  let currentPermutation = input;
+  let currentPermutation = puzzle;
   const steps: string[] = [];
 
   while (
@@ -44,25 +55,25 @@ export const solvePuzzle = (input: number[][]): Solution => {
       finalSolvedPuzzle
     )
   ) {
-    const topLeftValue = expectedSolvedPuzzle[0][0];
+    const topLeftValue = mutatingSolvedPuzzle[0][0];
     const topLeftSolved = solveTopLeftValue(
       topLeftValue,
       currentPermutation,
-      expectedSolvedPuzzle
+      mutatingSolvedPuzzle
     );
 
     steps.push(...topLeftSolved.steps);
 
     const partialSolvedPuzzle = solveForTopOrLeft(
       topLeftSolved.permutation,
-      expectedSolvedPuzzle
+      mutatingSolvedPuzzle
     );
 
     steps.push(...partialSolvedPuzzle.steps);
     currentPermutation = partialSolvedPuzzle.permutation;
   }
 
-  const transitionSequence = getTransitionSequence(input, steps);
+  const transitionSequence = getTransitionSequence(puzzle, steps);
 
   return {
     movesToSolve: transitionSequence.length - 1,
