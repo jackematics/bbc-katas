@@ -20,7 +20,13 @@
       <div
         id="grid"
         class="grid grid-rows-4 grid-cols-4 gap-3 h-[31.25rem] w-[31.25rem] p-3 flex bg-grid-dark-blue border-4 border-black rounded-lg"
-      ></div>
+      >
+        {{ range . }} {{ range . }}
+        <div
+          class="bg-container-dark-blue relative rounded-lg col-span-1 row-span-1 flex-none border-2 border-black"
+        ></div>
+        {{end}} {{end}}
+      </div>
     </div>
     <script src="/static/js/htmx.min.js"></script>
     <script type="text/javascript" src="/static/js/grid-render.js"></script>
