@@ -6,7 +6,6 @@ function renderTiles() {
   for (row = 0; row < 4; row++) {
     for (col = 0; col < 4; col++) {
       const tile = document.createElement("div");
-      tile.id = `tile-${row}${col}`;
       tile.className = tileClasses;
       grid.appendChild(tile);
     }
