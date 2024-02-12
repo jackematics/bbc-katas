@@ -3,7 +3,7 @@ package test
 import (
 	"testing"
 
-	grid_handler "github.com/jackematics/2048/grid_handler"
+	grid_handler "github.com/jackematics/2048/handler/grid_handler"
 	"github.com/stretchr/testify/assert"
 )
 

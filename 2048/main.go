@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"net/http"
 
+	page_handler "github.com/jackematics/2048/handler/page_handler"
 	grid_repository "github.com/jackematics/2048/repository"
 )
 
@@ -15,7 +16,7 @@ func main() {
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, req *http.Request) {
 		tmpl := template.Must(template.ParseFiles("static/index.html"))
-		tmpl.Execute(writer, grid_repository.Grid)
+		tmpl.Execute(writer, page_state)
 	})
 
 	http.Handle("/static/", http.StripPrefix("/static/", fs))
