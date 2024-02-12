@@ -10,9 +10,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/js/tailwind-config.js"></script>
   </head>
-  <body class="bg-page-background-blue h-screen w-screen">
+  <body class="bg-tile-16-colour h-screen w-screen">
     <h1
-      class="pt-4 text-center font-sans text-6xl font-bold text-grid-dark-blue"
+      class="pt-4 text-center font-sans text-8xl font-extrabold text-tile-512-colour"
     >
       2048
     </h1>
@@ -21,11 +21,77 @@
         id="grid"
         class="grid grid-rows-4 grid-cols-4 gap-3 h-[31.25rem] w-[31.25rem] p-3 flex bg-grid-dark-blue border-4 border-black rounded-lg"
       >
-        {{ range . }} {{ range . }}
+        {{ range . }}{{ range . }} {{if eq . 0}}
         <div
           class="bg-container-dark-blue relative rounded-lg col-span-1 row-span-1 flex-none border-2 border-black"
         ></div>
-        {{end}} {{end}}
+        {{else if eq . 2}}
+        <div
+          class="bg-tile-2-colour relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black text-6xl font-bold"
+        >
+          <div>2</div>
+        </div>
+        {{else if eq . 4}}
+        <div
+          class="bg-tile-4-colour relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black text-6xl font-bold"
+        >
+          <div>4</div>
+        </div>
+        {{else if eq . 8}}
+        <div
+          class="bg-tile-8-colour relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black text-6xl font-bold"
+        >
+          <div>8</div>
+        </div>
+        {{else if eq . 16}}
+        <div
+          class="bg-tile-16-colour relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black text-5xl font-bold"
+        >
+          <div>16</div>
+        </div>
+        {{else if eq . 32}}
+        <div
+          class="bg-tile-32-colour relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black text-5xl font-bold"
+        >
+          <div>32</div>
+        </div>
+        {{else if eq . 64}}
+        <div
+          class="bg-tile-64-colour relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black text-5xl font-bold"
+        >
+          <div>64</div>
+        </div>
+        {{else if eq . 128}}
+        <div
+          class="bg-tile-128-colour relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black text-5xl font-bold"
+        >
+          <div>128</div>
+        </div>
+        {{else if eq . 256}}
+        <div
+          class="bg-tile-256-colour relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black text-5xl font-bold"
+        >
+          <div>256</div>
+        </div>
+        {{else if eq . 512}}
+        <div
+          class="bg-tile-512-colour relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black text-5xl font-bold"
+        >
+          <div>512</div>
+        </div>
+        {{else if eq . 1024}}
+        <div
+          class="bg-tile-1024-colour relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black text-4xl font-bold"
+        >
+          <div>1024</div>
+        </div>
+        {{else if eq . 2048}}
+        <div
+          class="bg-tile-2048-colour relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black text-4xl font-bold"
+        >
+          <div>2048</div>
+        </div>
+        {{end}} {{end}} {{end}}
       </div>
     </div>
     <script src="/static/js/htmx.min.js"></script>
