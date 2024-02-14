@@ -1,4 +1,4 @@
-package grid_handler
+package grid_operations
 
 import "math/rand"
 

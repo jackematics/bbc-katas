@@ -1,26 +1,34 @@
 package main
 
 import (
-	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 
-	page_handler "github.com/jackematics/2048/handler/page_handler"
+	arrow_key_handler "github.com/jackematics/2048/handler"
+	page_operations "github.com/jackematics/2048/lib/page_operations"
 	grid_repository "github.com/jackematics/2048/repository"
 )
 
 func main() {
-	fs := http.FileServer(http.Dir("static"))
+	page_state := page_operations.InitPageState(grid_repository.Grid)
+	tmpl, err := template.ParseFiles(
+		"template/index.html",
+		"template/grid.html",
+	)
 
-	page_state := page_handler.InitPageState(grid_repository.Grid)
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
+	if err != nil {
+		log.Fatalf("could not init templates: %+v", err)
+	}
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, req *http.Request) {
-		tmpl := template.Must(template.ParseFiles("static/index.html"))
-		tmpl.Execute(writer, page_state)
+		tmpl.ExecuteTemplate(writer, "index.html", page_state)
 	})
 
-	http.Handle("/static/", http.StripPrefix("/static/", fs))
+	http.HandleFunc("/arrow-key-up", arrow_key_handler.ArrowKeyUpHandler)
 
-	fmt.Println("Server started on :8000")
+	log.Println("Server started on :8000")
 	http.ListenAndServe(":8000", nil)
 }

@@ -1,14 +1,14 @@
-package test
+package lib_test
 
 import (
 	"testing"
 
-	grid_handler "github.com/jackematics/2048/handler/grid_handler"
+	"github.com/jackematics/2048/lib/grid_operations"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestInitGrid(t *testing.T) {
-	grid := grid_handler.InitGrid()
+	grid := grid_operations.InitGrid()
 
 	zeroCount := 0
 	twoCount := 0

@@ -1,4 +1,4 @@
-package page_handler
+package page_operations
 
 type TileData struct {
 	Value    int

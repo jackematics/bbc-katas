@@ -1,5 +1,5 @@
 package grid_repository
 
-import grid_handler "github.com/jackematics/2048/handler/grid_handler"
+import "github.com/jackematics/2048/lib/grid_operations"
 
-var Grid = grid_handler.InitGrid()
+var Grid = grid_operations.InitGrid()

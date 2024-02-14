@@ -1,0 +1,15 @@
+{{ block "grid" . }}
+<div
+  id="grid"
+  class="grid grid-rows-4 grid-cols-4 gap-3 h-[31.25rem] w-[31.25rem] p-3 flex bg-grid-dark-blue border-4 border-black rounded-lg"
+>
+  {{ range . }}{{ range . }}
+  <div
+    class="{{ .BgColour }} relative rounded-lg col-span-1 row-span-1 flex justify-center border-2 border-black items-center text-black {{ .FontSize }} font-bold"
+  >
+    <div>{{if ne .Value 0}}{{.Value}}{{end}}</div>
+  </div>
+  {{ end }} {{ end }}
+</div>
+
+{{ end }}
