@@ -44,3 +44,41 @@ func InitGrid() [][]int {
 
 	return grid
 }
+
+func MoveTilesUp(grid *[][]int) {
+	tiles_still_moving := true
+	for tiles_still_moving {
+		tiles_still_moving = false
+
+		for row := 1; row < len(*grid); row++ {
+			for col := range (*grid)[0] {
+				if (*grid)[row][col] > 0 {
+					if (*grid)[row-1][col] == 0 {
+						(*grid)[row-1][col] = (*grid)[row][col]
+						(*grid)[row][col] = 0
+						tiles_still_moving = true
+					}
+				}
+			}
+		}
+	}
+}
+
+func MoveTilesRight(grid *[][]int) {
+	tiles_still_moving := true
+	for tiles_still_moving {
+		tiles_still_moving = false
+
+		for row := range *grid {
+			for col := 0; col < len((*grid)[0])-1; col++ {
+				if (*grid)[row][col] > 0 {
+					if (*grid)[row][col+1] == 0 {
+						(*grid)[row][col+1] = (*grid)[row][col]
+						(*grid)[row][col] = 0
+						tiles_still_moving = true
+					}
+				}
+			}
+		}
+	}
+}

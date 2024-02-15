@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-	page_state := page_operations.CreateGridPageState(grid_repository.Grid)
 	tmpl, err := template.ParseFiles(
 		"template/index.html",
 		"template/grid.html",
@@ -24,10 +23,12 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(writer http.ResponseWriter, req *http.Request) {
+		page_state := page_operations.CreateGridPageState(grid_repository.Grid)
 		tmpl.ExecuteTemplate(writer, "index.html", page_state)
 	})
 
 	http.HandleFunc("/arrow-key-up", arrow_key_handler.ArrowKeyUpHandler)
+	http.HandleFunc("/arrow-key-right", arrow_key_handler.ArrowKeyRightHandler)
 
 	log.Println("Server started on :8000")
 	http.ListenAndServe(":8000", nil)
