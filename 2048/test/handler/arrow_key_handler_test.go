@@ -11,14 +11,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestUpArrowKeyHandler(t *testing.T) {
-	req, err := http.NewRequest("GET", "/arrow-key-up", nil)
+func TestUpArrowKey(t *testing.T) {
+	req, err := http.NewRequest("GET", "/arrow-key-event?key=ArrowUp", nil)
 
 	assert.Equal(t, nil, err)
 
 	rr := httptest.NewRecorder()
 
-	arrow_key_handler.ArrowKeyUpHandler(rr, req)
+	arrow_key_handler.ArrowKeyEventHandler(rr, req)
 
 	grid := grid_repository.Grid
 
@@ -33,14 +33,14 @@ func TestUpArrowKeyHandler(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rr.Code)
 }
 
-func TestRightArrowKeyHandler(t *testing.T) {
-	req, err := http.NewRequest("GET", "/arrow-key-right", nil)
+func TestRightArrowKey(t *testing.T) {
+	req, err := http.NewRequest("GET", "/arrow-key-event?key=ArrowRight", nil)
 
 	assert.Equal(t, nil, err)
 
 	rr := httptest.NewRecorder()
 
-	arrow_key_handler.ArrowKeyRightHandler(rr, req)
+	arrow_key_handler.ArrowKeyEventHandler(rr, req)
 
 	grid := grid_repository.Grid
 

@@ -27,8 +27,7 @@ func main() {
 		tmpl.ExecuteTemplate(writer, "index.html", page_state)
 	})
 
-	http.HandleFunc("/arrow-key-up", arrow_key_handler.ArrowKeyUpHandler)
-	http.HandleFunc("/arrow-key-right", arrow_key_handler.ArrowKeyRightHandler)
+	http.HandleFunc("/arrow-key-event", arrow_key_handler.ArrowKeyEventHandler)
 
 	log.Println("Server started on :8000")
 	http.ListenAndServe(":8000", nil)

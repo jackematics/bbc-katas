@@ -5,7 +5,7 @@
 
 - Pressing an arrow key makes all tiles go in the specified direction until an obstacle is hit
   - ~~Pressing the up arrow key move all tiles up until an obstacle is hit~~ :white_check_mark:
-  - Pressing the right arrow key move all tiles right until an obstacle is hit
+  - ~~Pressing the right arrow key move all tiles right until an obstacle is hit~~ :white_check_mark:
   - Pressing the down arrow key move all tiles down until an obstacle is hit
   - Pressing the left arrow key move all tiles left until an obstacle is hit
   - End tiles move first (e.g. when up arrow key is pressed, the end tile is the top tile)

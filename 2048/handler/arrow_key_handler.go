@@ -9,16 +9,16 @@ import (
 	grid_repository "github.com/jackematics/2048/repository"
 )
 
-func ArrowKeyUpHandler(writer http.ResponseWriter, req *http.Request) {
-	grid_operations.MoveTilesUp(&grid_repository.Grid)
-	page_state := page_operations.CreateGridPageState(grid_repository.Grid)
+func ArrowKeyEventHandler(writer http.ResponseWriter, req *http.Request) {
+	key := req.URL.Query().Get("key")
 
-	tmpl := template.Must(template.ParseFiles("template/grid.html"))
-	tmpl.ExecuteTemplate(writer, "grid", page_state)
-}
+	switch key {
+	case "ArrowUp":
+		grid_operations.MoveTilesUp(&grid_repository.Grid)
+	case "ArrowRight":
+		grid_operations.MoveTilesRight(&grid_repository.Grid)
+	}
 
-func ArrowKeyRightHandler(writer http.ResponseWriter, req *http.Request) {
-	grid_operations.MoveTilesRight(&grid_repository.Grid)
 	page_state := page_operations.CreateGridPageState(grid_repository.Grid)
 
 	tmpl := template.Must(template.ParseFiles("template/grid.html"))

@@ -18,13 +18,13 @@
     </h1>
     <div class="flex justify-center pt-16">{{ template "grid" .}}</div>
     <div
-      hx-get="/arrow-key-up"
+      hx-get="/arrow-key-event?key=ArrowUp"
       hx-target="#grid"
       hx-trigger="keydown[key=='ArrowUp'] from:body"
       hx-swap="outerHTML"
     ></div>
     <div
-      hx-get="/arrow-key-right"
+      hx-get="/arrow-key-event?key=ArrowRight"
       hx-target="#grid"
       hx-trigger="keydown[key=='ArrowRight'] from:body"
       hx-swap="outerHTML"
