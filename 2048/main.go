@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	page_state := page_operations.InitPageState(grid_repository.Grid)
+	page_state := page_operations.CreateGridPageState(grid_repository.Grid)
 	tmpl, err := template.ParseFiles(
 		"template/index.html",
 		"template/grid.html",

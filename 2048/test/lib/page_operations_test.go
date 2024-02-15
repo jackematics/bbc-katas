@@ -8,10 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestInitPageState(t *testing.T) {
+func TestCreateGridPageState(t *testing.T) {
 	grid := [][]int{{0, 2, 4}, {8, 16, 32}, {64, 128, 256}, {512, 1024, 2048}}
 
-	page_state := page_operations.InitPageState(grid)
+	page_state := page_operations.CreateGridPageState(grid)
 	expected := [][]page_operations.TileData{
 		{
 			{Value: 0, BgColour: "bg-container-dark-blue", FontSize: "text-6xl"},

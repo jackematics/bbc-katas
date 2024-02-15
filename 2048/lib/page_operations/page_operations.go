@@ -21,7 +21,7 @@ var tile_html_mappings = map[int]TileData{
 	2048: {Value: 2048, BgColour: "bg-tile-2048-colour", FontSize: "text-4xl"},
 }
 
-func InitPageState(grid [][]int) [][]TileData {
+func CreateGridPageState(grid [][]int) [][]TileData {
 	grid_html := [][]TileData{}
 
 	for row := range grid {
