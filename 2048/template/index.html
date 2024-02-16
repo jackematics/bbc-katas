@@ -10,7 +10,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/static/js/tailwind-config.js"></script>
   </head>
-  <body class="bg-tile-16-colour h-screen w-screen">
+  <body class="bg-tile-16-colour h-screen w-screen" hx-ext="true">
     <h1
       class="pt-4 text-center font-sans text-8xl font-extrabold text-tile-512-colour"
     >
@@ -18,16 +18,11 @@
     </h1>
     <div class="flex justify-center pt-16">{{ template "grid" .}}</div>
     <div
-      hx-get="/arrow-key-event?key=ArrowUp"
+      hx-post="/arrow-key-event"
       hx-target="#grid"
-      hx-trigger="keydown[key=='ArrowUp'] from:body"
+      hx-trigger="keydown[key=='ArrowUp'||key=='ArrowRight'||key=='ArrowDown'||key=='ArrowLeft'] from:body"
       hx-swap="outerHTML"
-    ></div>
-    <div
-      hx-get="/arrow-key-event?key=ArrowRight"
-      hx-target="#grid"
-      hx-trigger="keydown[key=='ArrowRight'] from:body"
-      hx-swap="outerHTML"
+      hx-vals="js:{arrow_key: event.key}"
     ></div>
     <script src="/static/js/htmx.min.js"></script>
   </body>

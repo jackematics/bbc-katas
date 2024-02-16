@@ -82,3 +82,41 @@ func MoveTilesRight(grid *[][]int) {
 		}
 	}
 }
+
+func MoveTilesDown(grid *[][]int) {
+	tiles_still_moving := true
+	for tiles_still_moving {
+		tiles_still_moving = false
+
+		for row := 0; row < len(*grid)-1; row++ {
+			for col := range (*grid)[0] {
+				if (*grid)[row][col] > 0 {
+					if (*grid)[row+1][col] == 0 {
+						(*grid)[row+1][col] = (*grid)[row][col]
+						(*grid)[row][col] = 0
+						tiles_still_moving = true
+					}
+				}
+			}
+		}
+	}
+}
+
+func MoveTilesLeft(grid *[][]int) {
+	tiles_still_moving := true
+	for tiles_still_moving {
+		tiles_still_moving = false
+
+		for row := range *grid {
+			for col := 1; col < len((*grid)[0]); col++ {
+				if (*grid)[row][col] > 0 {
+					if (*grid)[row][col-1] == 0 {
+						(*grid)[row][col-1] = (*grid)[row][col]
+						(*grid)[row][col] = 0
+						tiles_still_moving = true
+					}
+				}
+			}
+		}
+	}
+}
