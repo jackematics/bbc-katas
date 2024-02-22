@@ -17,6 +17,7 @@ tailwind.config = {
       "tile-512-colour": "#FDE992",
       "tile-1024-colour": "#FC6A03",
       "tile-2048-colour": "#D21404",
+      contrast: "#EEC9BC",
     },
     extend: {
       backgroundImage: {
