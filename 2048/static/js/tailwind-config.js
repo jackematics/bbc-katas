@@ -1,4 +1,5 @@
 tailwind.config = {
+  content: ["../template/*.html"],
   theme: {
     colors: {
       black: "#000000",
@@ -6,6 +7,9 @@ tailwind.config = {
       "page-background-blue": "#3253ad",
       "grid-dark-blue": "#011F4B",
       "container-dark-blue": "#083158",
+      "button-colour": "#dd1212",
+      "button-hover-colour": "#eb2d2d",
+      "button-active-colour": "#f55353",
       "tile-2-colour": "#82EEFD",
       "tile-4-colour": "#63C5DA",
       "tile-8-colour": "#52B2BF",
@@ -17,7 +21,6 @@ tailwind.config = {
       "tile-512-colour": "#FDE992",
       "tile-1024-colour": "#FC6A03",
       "tile-2048-colour": "#D21404",
-      contrast: "#EEC9BC",
     },
     extend: {
       backgroundImage: {
