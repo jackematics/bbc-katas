@@ -1,4 +1,4 @@
-package arrow_key_handler
+package grid_handler
 
 import (
 	"io"
@@ -34,6 +34,14 @@ func ArrowKeyEventHandler(writer http.ResponseWriter, req *http.Request) {
 		http.Error(writer, "Invalid key", http.StatusBadRequest)
 	}
 
+	page_state := page_operations.CreateGridPageState(grid_repository.Grid)
+
+	tmpl := template.Must(template.ParseFiles("template/grid.html"))
+	tmpl.ExecuteTemplate(writer, "grid", page_state)
+}
+
+func NewGameHandler(writer http.ResponseWriter, req *http.Request) {
+	grid_repository.Grid = grid_operations.InitGrid()
 	page_state := page_operations.CreateGridPageState(grid_repository.Grid)
 
 	tmpl := template.Must(template.ParseFiles("template/grid.html"))

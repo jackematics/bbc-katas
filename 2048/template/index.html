@@ -19,6 +19,10 @@
     <div class="pt-14 flex justify-center items-center">
       <div class="w-[29rem] flex justify-start">
         <button
+          hx-post="/new-game-event"
+          hx-target="#grid"
+          hx-trigger="click"
+          hx-swap="outerHTML"
           class="mr-3 w-[7.6rem] h-[2.7rem] border border-black border-2 rounded bg-button-colour py-2 px-4 font-bold text-black hover:bg-button-hover-colour active:bg-button-active-colour"
         >
           New Game

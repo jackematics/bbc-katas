@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	arrow_key_handler "github.com/jackematics/2048/handler"
+	grid_handler "github.com/jackematics/2048/handler/grid_handler"
 	page_operations "github.com/jackematics/2048/lib/page_operations"
 	grid_repository "github.com/jackematics/2048/repository"
 )
@@ -27,7 +27,8 @@ func main() {
 		tmpl.ExecuteTemplate(writer, "index.html", page_state)
 	})
 
-	http.HandleFunc("/arrow-key-event", arrow_key_handler.ArrowKeyEventHandler)
+	http.HandleFunc("/arrow-key-event", grid_handler.ArrowKeyEventHandler)
+	http.HandleFunc("/new-game-event", grid_handler.NewGameHandler)
 
 	log.Println("Server started on :8000")
 	http.ListenAndServe(":8000", nil)
