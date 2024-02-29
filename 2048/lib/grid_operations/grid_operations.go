@@ -55,7 +55,23 @@ func MoveTilesUp(grid *[][]int) {
 	colRange := Range{0, len((*grid)[0])}
 	swapDelta := GridIndex{-1, 0}
 
-	moveTiles(grid, rowRange, colRange, swapDelta)
+	tile_move_count := moveTiles(grid, rowRange, colRange, swapDelta)
+
+	for row := rowRange.Start; row < rowRange.End; row++ {
+		for col := colRange.Start; col < colRange.End; col++ {
+			if (*grid)[row+swapDelta.Row][col+swapDelta.Col] == (*grid)[row][col] {
+				(*grid)[row+swapDelta.Row][col+swapDelta.Col] = 2 * (*grid)[row][col]
+				(*grid)[row][col] = 0
+				tile_move_count++
+			}
+		}
+	}
+
+	tile_move_count += moveTiles(grid, rowRange, colRange, swapDelta)
+
+	if tile_move_count > 0 {
+		generateTileInGrid(grid)
+	}
 }
 
 func MoveTilesRight(grid *[][]int) {
@@ -63,7 +79,23 @@ func MoveTilesRight(grid *[][]int) {
 	colRange := Range{0, len((*grid)[0]) - 1}
 	swapDelta := GridIndex{0, +1}
 
-	moveTiles(grid, rowRange, colRange, swapDelta)
+	tile_move_count := moveTiles(grid, rowRange, colRange, swapDelta)
+
+	for row := rowRange.Start; row < rowRange.End; row++ {
+		for col := colRange.End - 1; col >= colRange.Start; col-- {
+			if (*grid)[row+swapDelta.Row][col+swapDelta.Col] == (*grid)[row][col] {
+				(*grid)[row+swapDelta.Row][col+swapDelta.Col] = 2 * (*grid)[row][col]
+				(*grid)[row][col] = 0
+				tile_move_count++
+			}
+		}
+	}
+
+	tile_move_count += moveTiles(grid, rowRange, colRange, swapDelta)
+
+	if tile_move_count > 0 {
+		generateTileInGrid(grid)
+	}
 }
 
 func MoveTilesDown(grid *[][]int) {
@@ -71,7 +103,22 @@ func MoveTilesDown(grid *[][]int) {
 	colRange := Range{0, len((*grid)[0])}
 	swapDelta := GridIndex{+1, 0}
 
-	moveTiles(grid, rowRange, colRange, swapDelta)
+	tile_move_count := moveTiles(grid, rowRange, colRange, swapDelta)
+
+	for row := rowRange.End - 1; row >= rowRange.Start; row-- {
+		for col := colRange.Start; col < colRange.End; col++ {
+			if (*grid)[row+swapDelta.Row][col+swapDelta.Col] == (*grid)[row][col] {
+				(*grid)[row+swapDelta.Row][col+swapDelta.Col] = 2 * (*grid)[row][col]
+				(*grid)[row][col] = 0
+				tile_move_count++
+			}
+		}
+	}
+	tile_move_count += moveTiles(grid, rowRange, colRange, swapDelta)
+
+	if tile_move_count > 0 {
+		generateTileInGrid(grid)
+	}
 }
 
 func MoveTilesLeft(grid *[][]int) {
@@ -79,10 +126,25 @@ func MoveTilesLeft(grid *[][]int) {
 	colRange := Range{1, len((*grid)[0])}
 	swapDelta := GridIndex{0, -1}
 
-	moveTiles(grid, rowRange, colRange, swapDelta)
+	tile_move_count := moveTiles(grid, rowRange, colRange, swapDelta)
+
+	for row := rowRange.Start; row < rowRange.End; row++ {
+		for col := colRange.Start; col < colRange.End; col++ {
+			if (*grid)[row+swapDelta.Row][col+swapDelta.Col] == (*grid)[row][col] {
+				(*grid)[row+swapDelta.Row][col+swapDelta.Col] = 2 * (*grid)[row][col]
+				(*grid)[row][col] = 0
+				tile_move_count++
+			}
+		}
+	}
+	tile_move_count += moveTiles(grid, rowRange, colRange, swapDelta)
+
+	if tile_move_count > 0 {
+		generateTileInGrid(grid)
+	}
 }
 
-func moveTiles(grid *[][]int, rowRange Range, colRange Range, swapDelta GridIndex) {
+func moveTiles(grid *[][]int, rowRange Range, colRange Range, swapDelta GridIndex) int {
 	tile_move_count := 0
 	tiles_still_moving := true
 
@@ -99,18 +161,10 @@ func moveTiles(grid *[][]int, rowRange Range, colRange Range, swapDelta GridInde
 						tile_move_count++
 					}
 
-					if (*grid)[row+swapDelta.Row][col+swapDelta.Col] == (*grid)[row][col] {
-						(*grid)[row+swapDelta.Row][col+swapDelta.Col] = 2 * (*grid)[row][col]
-						(*grid)[row][col] = 0
-						tiles_still_moving = true
-						tile_move_count++
-					}
 				}
 			}
 		}
 	}
 
-	if tile_move_count > 0 {
-		generateTileInGrid(grid)
-	}
+	return tile_move_count
 }

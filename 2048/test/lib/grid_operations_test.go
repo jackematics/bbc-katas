@@ -85,21 +85,24 @@ func TestMoveTilesLeft(t *testing.T) {
 
 func TestMergeTilesUp(t *testing.T) {
 	grid := [][]int{
-		{0, 0, 0, 0},
 		{0, 2, 0, 0},
 		{0, 2, 0, 0},
-		{0, 0, 0, 0},
+		{0, 2, 0, 0},
+		{0, 2, 0, 0},
 	}
 
 	grid_operations.MoveTilesUp(&grid)
 
 	assert.Equal(t, 4, grid[0][1])
+	assert.Equal(t, 4, grid[1][1])
+	assert.Equal(t, 0, grid[2][1])
+	assert.Equal(t, 0, grid[3][1])
 }
 
 func TestMergeTilesRight(t *testing.T) {
 	grid := [][]int{
 		{0, 0, 0, 0},
-		{0, 2, 2, 0},
+		{2, 2, 2, 2},
 		{0, 0, 0, 0},
 		{0, 0, 0, 0},
 	}
@@ -107,23 +110,29 @@ func TestMergeTilesRight(t *testing.T) {
 	grid_operations.MoveTilesRight(&grid)
 
 	assert.Equal(t, 4, grid[1][3])
+	assert.Equal(t, 4, grid[1][2])
+	assert.Equal(t, 0, grid[1][1])
+	assert.Equal(t, 0, grid[1][0])
 }
 func TestMergeTilesDown(t *testing.T) {
 	grid := [][]int{
-		{0, 0, 0, 0},
 		{0, 2, 0, 0},
 		{0, 2, 0, 0},
-		{0, 0, 0, 0},
+		{0, 2, 0, 0},
+		{0, 2, 0, 0},
 	}
 
 	grid_operations.MoveTilesDown(&grid)
 
+	assert.Equal(t, 0, grid[0][1])
+	assert.Equal(t, 0, grid[1][1])
+	assert.Equal(t, 4, grid[2][1])
 	assert.Equal(t, 4, grid[3][1])
 }
 func TestMergeTilesLeft(t *testing.T) {
 	grid := [][]int{
 		{0, 0, 0, 0},
-		{0, 2, 2, 0},
+		{2, 2, 2, 2},
 		{0, 0, 0, 0},
 		{0, 0, 0, 0},
 	}
@@ -131,6 +140,9 @@ func TestMergeTilesLeft(t *testing.T) {
 	grid_operations.MoveTilesLeft(&grid)
 
 	assert.Equal(t, 4, grid[1][0])
+	assert.Equal(t, 4, grid[1][1])
+	assert.Equal(t, 0, grid[1][2])
+	assert.Equal(t, 0, grid[1][3])
 }
 
 func TestTileGeneratedOnMove(t *testing.T) {
