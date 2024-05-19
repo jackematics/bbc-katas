@@ -103,33 +103,51 @@ export default function useAvatar({ canvasRef }) {
     ctx.stroke();
   }
 
-  function getSurroundingHexagons(hexagon) {
+  function getSurroundingHexStarts(hexStart) {
     return [
-      hexagon.map((point) => ({
-        x: point.x,
-        y: point.y - 2 * hexDims.apothem,
-      })),
-      hexagon.map((point) => ({
-        x: point.x + 1.5 * hexDims.sideLength,
-        y: point.y - hexDims.apothem,
-      })),
-      hexagon.map((point) => ({
-        x: point.x + 1.5 * hexDims.sideLength,
-        y: point.y + hexDims.apothem,
-      })),
-      hexagon.map((point) => ({
-        x: point.x,
-        y: point.y + 2 * hexDims.apothem,
-      })),
-      hexagon.map((point) => ({
-        x: point.x - 1.5 * hexDims.sideLength,
-        y: point.y + hexDims.apothem,
-      })),
-      hexagon.map((point) => ({
-        x: point.x - 1.5 * hexDims.sideLength,
-        y: point.y - hexDims.apothem,
-      })),
+      { x: hexStart.x, y: hexStart.y - 2 * hexDims.apothem},
+      { x: hexStart.x + 1.5 * hexDims.sideLength, y: hexStart.y - hexDims.apothem},
+      { x: hexStart.x + 1.5 * hexDims.sideLength, y: hexStart.y + hexDims.apothem},
+      { x: hexStart.x, y: hexStart.y + 2 * hexDims.apothem},
+      { x: hexStart.x - 1.5 * hexDims.sideLength, y: hexStart.y + hexDims.apothem},
+      { x: hexStart.x - 1.5 * hexDims.sideLength, y: hexStart.y - hexDims.apothem},
     ];
+  }
+
+  function hexCovered(hexStart, covered) {
+    for (let i = 0; i < covered.length; i++) {
+      if (covered[i].x === hexStart.x && covered[i].y === hexStart.y) {
+        return true
+      }
+    }
+
+    return false
+  }
+  function onlyOneAdjacent(hexStart, covered) {
+
+    const surrounding = getSurroundingHexStarts(hexStart).filter((surroundingStart) => hexCovered(surroundingStart, covered))
+    console.log("cheese", getSurroundingHexStarts(hexStart));
+
+    return surrounding.length === 1
+  }
+
+  function extendTailToBoundary(ctx, hexStart, covered) {
+    const validSurroundingStarts = getSurroundingHexStarts(hexStart)
+      .filter((surroundingStart) => !hexCovered(surroundingStart, covered))
+      .filter((surroundingStart) => onlyOneAdjacent(surroundingStart, covered))
+
+
+    if (validSurroundingStarts.length === 0) {
+      return
+    }
+
+    const randomIndex = Math.floor(Math.random() * Math.floor(validSurroundingStarts.length))
+    const selectedStart = validSurroundingStarts[randomIndex]
+
+    drawHexagon(ctx, buildHexagon(selectedStart))
+    covered.push(selectedStart)
+
+    extendTailToBoundary(ctx, selectedStart, covered)
   }
 
   function generate() {
@@ -144,23 +162,31 @@ export default function useAvatar({ canvasRef }) {
 
     const covered = getBoundaries(xCentre, yCentre);
 
-    const centreHex = buildHexagon({
+    const centreHexStart ={
       x: xCentre - hexDims.sideLength / 2,
       y: yCentre - hexDims.apothem,
-    });
+    };
 
-    const surrounding = getSurroundingHexagons(centreHex);
+    const surroundingHexStarts = getSurroundingHexStarts(centreHexStart);
 
-    drawHexagon(ctx, centreHex);
-    covered.push(centreHex[0]);
+    drawHexagon(ctx, buildHexagon(centreHexStart));
+    covered.push(centreHexStart);
+    console.log("true?", hexCovered(centreHexStart, covered));
 
+    const tails = []
     const oneOrZero = Math.round(Math.random());
-    surrounding.forEach((hex, index) => {
+    surroundingHexStarts.forEach((hexStart, index) => {
       if (index % 2 === oneOrZero) {
-        drawHexagon(ctx, hex);
-        covered.push(hex[0]);
+        drawHexagon(ctx, buildHexagon(hexStart));
+        covered.push(hexStart);
+        tails.push(hexStart)
       }
     });
+
+    
+    extendTailToBoundary(ctx, tails[0], covered)
+    // tails.forEach((hexStart) => {
+    // })
   }
 
   return {
