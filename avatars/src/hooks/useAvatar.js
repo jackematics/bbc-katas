@@ -114,7 +114,7 @@ export default function useAvatar({ canvasRef }) {
     ];
   }
 
-  function hexCovered(hexStart, covered) {
+  function hexInCollection(hexStart, covered) {
     for (let i = 0; i < covered.length; i++) {
       if (covered[i].x === hexStart.x && covered[i].y === hexStart.y) {
         return true
@@ -125,15 +125,14 @@ export default function useAvatar({ canvasRef }) {
   }
   function onlyOneAdjacent(hexStart, covered) {
 
-    const surrounding = getSurroundingHexStarts(hexStart).filter((surroundingStart) => hexCovered(surroundingStart, covered))
-    console.log("cheese", getSurroundingHexStarts(hexStart));
+    const surrounding = getSurroundingHexStarts(hexStart).filter((surroundingStart) => hexInCollection(surroundingStart, covered))
 
     return surrounding.length === 1
   }
 
   function extendTailToBoundary(ctx, hexStart, covered) {
     const validSurroundingStarts = getSurroundingHexStarts(hexStart)
-      .filter((surroundingStart) => !hexCovered(surroundingStart, covered))
+      .filter((surroundingStart) => !hexInCollection(surroundingStart, covered))
       .filter((surroundingStart) => onlyOneAdjacent(surroundingStart, covered))
 
 
@@ -148,7 +147,52 @@ export default function useAvatar({ canvasRef }) {
     covered.push(selectedStart)
 
     extendTailToBoundary(ctx, selectedStart, covered)
+
   }
+
+  function getValidSurroundingHexStarts(routeTails, covered, boundaries) {
+    return routeTails.filter((routeTail) => {
+      const surroundingUncoveredFirstLayer = getSurroundingHexStarts(routeTail)
+        .filter((surroundingFirstLayerItem) => !hexInCollection(surroundingFirstLayerItem, covered))
+
+      const someAdjacentToOneUncoveredHex = surroundingUncoveredFirstLayer
+        .filter((surroundingFirstLayerItem) => 
+          getSurroundingHexStarts(surroundingFirstLayerItem)
+          .filter((surroundingSecondLayerItem) => hexInCollection(surroundingSecondLayerItem, covered))
+          .length === 1
+        )
+
+      const adjacentToBoundary = surroundingUncoveredFirstLayer.some((hexStart) => boundaries.includes(hexStart))
+
+      return someAdjacentToOneUncoveredHex || adjacentToBoundary
+    })
+  }
+
+  function routesSaturated(routeTails, covered, boundaries) {
+    return routeTails.filter((routeTail) => {
+      const surroundingUncoveredFirstLayer = getSurroundingHexStarts(routeTail)
+        .filter((surroundingFirstLayerItem) => !hexInCollection(surroundingFirstLayerItem, covered))
+
+      const someAdjacentToOneUncoveredHex = surroundingUncoveredFirstLayer
+        .filter((surroundingFirstLayerItem) => 
+          getSurroundingHexStarts(surroundingFirstLayerItem)
+          .filter((surroundingSecondLayerItem) => hexInCollection(surroundingSecondLayerItem, covered))
+          .length === 1
+        )
+
+      const adjacentToBoundary = surroundingUncoveredFirstLayer.some((hexStart) => boundaries.includes(hexStart))
+
+      return someAdjacentToOneUncoveredHex || adjacentToBoundary
+    }).length === 0
+  }
+
+  function saturateRoutes(ctx, routeTails, covered, boundaries) {
+    let validSurroundingHexStarts = getValidSurroundingHexStarts(routeTails, covered, boundaries)
+    while (validSurroundingHexStarts.length > 0) {
+      
+    }
+  }
+  
 
   function generate() {
     const canvas = canvasRef.current;
@@ -160,7 +204,7 @@ export default function useAvatar({ canvasRef }) {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     ctx.fillStyle = "#000000";
 
-    const covered = getBoundaries(xCentre, yCentre);
+    const boundaries = getBoundaries(xCentre, yCentre);
 
     const centreHexStart ={
       x: xCentre - hexDims.sideLength / 2,
@@ -170,8 +214,7 @@ export default function useAvatar({ canvasRef }) {
     const surroundingHexStarts = getSurroundingHexStarts(centreHexStart);
 
     drawHexagon(ctx, buildHexagon(centreHexStart));
-    covered.push(centreHexStart);
-    console.log("true?", hexCovered(centreHexStart, covered));
+    const covered = [centreHexStart]
 
     const tails = []
     const oneOrZero = Math.round(Math.random());
@@ -184,9 +227,11 @@ export default function useAvatar({ canvasRef }) {
     });
 
     
-    extendTailToBoundary(ctx, tails[0], covered)
-    // tails.forEach((hexStart) => {
-    // })
+    // extendTailToBoundary(ctx, tails[0], covered)
+    // extendTailToBoundary(ctx, tails[1], covered)
+    // extendTailToBoundary(ctx, tails[2], covered)
+
+
   }
 
   return {
