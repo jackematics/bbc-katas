@@ -14,7 +14,7 @@ function App() {
   return (
     <>
       <h1 className="text-xxl font-bold pb-8">Avatars</h1>
-      <canvas ref={canvasRef} width="250" height="286" className='border-2 border-black' />
+      <canvas ref={canvasRef} width="254" height="286" className='border-2 border-black' />
     </>
   )
 }

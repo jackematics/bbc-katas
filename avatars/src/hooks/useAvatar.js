@@ -126,9 +126,9 @@ export default function useAvatar({ canvasRef }) {
     ];
   }
 
-  function hexInCollection(hexStart, covered) {
-    for (let i = 0; i < covered.length; i++) {
-      if (covered[i].x === hexStart.x && covered[i].y === hexStart.y) {
+  function hexInCollection(hexStart, collection) {
+    for (let i = 0; i < collection.length; i++) {
+      if (collection[i].x === hexStart.x && collection[i].y === hexStart.y) {
         return true;
       }
     }
@@ -168,7 +168,7 @@ export default function useAvatar({ canvasRef }) {
     );
 
     while (
-      validSurroundingRoutePaths.some((routePath) => routePath.length > 0)
+      routeTails.length > 0
     ) {
       validSurroundingRoutePaths.forEach((potentialNextPaths, index) => {
         const randomNextPathIndex = Math.floor(
@@ -184,6 +184,19 @@ export default function useAvatar({ canvasRef }) {
       routeTails.forEach((tail) => {
         drawHexagon(ctx, buildHexagon(tail));
       });
+
+      routeTails = routeTails.filter((tail) => {
+        const surroundingHexStarts = getSurroundingHexStarts(tail)
+
+        for (let i = 0; i < surroundingHexStarts.length; i++) {
+          if (hexInCollection(surroundingHexStarts[i], boundaries)) {
+            return false;
+          }
+        }
+
+        return true
+      })
+
       validSurroundingRoutePaths = getValidSurroundingRoutePaths(
         routeTails,
         covered,
