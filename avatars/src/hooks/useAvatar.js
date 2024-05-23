@@ -136,8 +136,8 @@ export default function useAvatar({ canvasRef }) {
     return false;
   }
 
-  function getValidSurroundingRoutePaths(routeTails, covered, boundaries) {
-    return routeTails.map((routeTail) =>
+  function getValidSurroundingRoutePaths(routeTail, covered, boundaries) {
+    return (
       getSurroundingHexStarts(routeTail)
         // filter out covered hexes
         .filter(
@@ -161,15 +161,11 @@ export default function useAvatar({ canvasRef }) {
 
   function generateRoutes(routeTails, covered, boundaries, ctx) {
     const routes = routeTails.map((routeTail) => [routeTail]);
-    let validSurroundingRoutePaths = getValidSurroundingRoutePaths(
-      routeTails,
-      covered,
-      boundaries
+    let validSurroundingRoutePaths = routeTails.map((routeTail) =>
+      getValidSurroundingRoutePaths(routeTail, covered, boundaries)
     );
 
-    while (
-      routeTails.length > 0
-    ) {
+    while (routeTails.length > 0) {
       validSurroundingRoutePaths.forEach((potentialNextPaths, index) => {
         const randomNextPathIndex = Math.floor(
           Math.random() * Math.floor(potentialNextPaths.length)
@@ -186,7 +182,7 @@ export default function useAvatar({ canvasRef }) {
       });
 
       routeTails = routeTails.filter((tail) => {
-        const surroundingHexStarts = getSurroundingHexStarts(tail)
+        const surroundingHexStarts = getSurroundingHexStarts(tail);
 
         for (let i = 0; i < surroundingHexStarts.length; i++) {
           if (hexInCollection(surroundingHexStarts[i], boundaries)) {
@@ -194,13 +190,11 @@ export default function useAvatar({ canvasRef }) {
           }
         }
 
-        return true
-      })
+        return true;
+      });
 
-      validSurroundingRoutePaths = getValidSurroundingRoutePaths(
-        routeTails,
-        covered,
-        boundaries
+      validSurroundingRoutePaths = routeTails.map((tail) =>
+        getValidSurroundingRoutePaths(tail, covered, boundaries)
       );
     }
 
@@ -245,11 +239,24 @@ export default function useAvatar({ canvasRef }) {
 
     const routes = generateRoutes(routeTails, covered, boundaries, ctx);
 
-    routes.forEach((route) => {
-      route.forEach((hex) => {
-        drawHexagon(ctx, buildHexagon(hex));
-      });
-    });
+    const validBranchTails = routes
+      .reduce((acc, current) => [...acc, ...current], [])
+      .filter(
+        (hexStart) =>
+          getValidSurroundingRoutePaths(hexStart, covered, boundaries).length >
+          0
+      );
+
+    // console.log("cheese", validBranchTails);
+    // const branchRoutes = validBranchTails.map((tail) =>
+    //   generateRoutes([tail], covered, boundaries, ctx)
+    // );
+
+    // routes.forEach((route) => {
+    //   route.forEach((hex) => {
+    //     drawHexagon(ctx, buildHexagon(hex));
+    //   });
+    // });
   }
 
   return {
