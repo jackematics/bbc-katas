@@ -102,6 +102,8 @@ export default function useAvatar({ canvasRef }) {
     ctx.lineTo(hexagon[0].x, hexagon[0].y);
     ctx.strokeStyle = colour;
     ctx.stroke();
+    ctx.fillStyle = colour;
+    ctx.fill();
   }
 
   function getSurroundingHexStarts(hexStart) {
@@ -160,7 +162,7 @@ export default function useAvatar({ canvasRef }) {
     );
   }
 
-  function generateRoutes(routeTails, covered, boundaries, ctx) {
+  function generateRoutes(routeTails, covered, boundaries) {
     const routes = routeTails.map((routeTail) => [routeTail]);
     let validSurroundingRoutePaths = routeTails.map((routeTail) =>
       getValidSurroundingRoutePaths(routeTail, covered, boundaries)
@@ -183,10 +185,6 @@ export default function useAvatar({ canvasRef }) {
         covered.push(selectedStart);
         routeTails[i] = selectedStart;
       }
-
-      routeTails.forEach((tail) => {
-        drawHexagon(ctx, buildHexagon(tail));
-      });
 
       routeTails = routeTails.filter((tail) => {
         const surroundingHexStarts = getSurroundingHexStarts(tail);
@@ -215,6 +213,12 @@ export default function useAvatar({ canvasRef }) {
         (hexStart) =>
           getValidSurroundingRoutePaths(hexStart, covered, boundaries).length >
           0
+      )
+      .filter(
+        (hexStart) =>
+          getSurroundingHexStarts(hexStart).filter((firstLayerHexStart) =>
+            hexInCollection(firstLayerHexStart, boundaries)
+          ).length === 0
       );
   }
 
@@ -240,7 +244,6 @@ export default function useAvatar({ canvasRef }) {
 
     const surroundingHexStarts = getSurroundingHexStarts(centreHexStart);
 
-    drawHexagon(ctx, buildHexagon(centreHexStart));
     const covered = [centreHexStart];
 
     const oneOrZero = Math.round(Math.random());
@@ -250,17 +253,20 @@ export default function useAvatar({ canvasRef }) {
       if (i % 2 === oneOrZero) {
         covered.push(surroundingHexStarts[i]);
         routeTails.push(surroundingHexStarts[i]);
-        drawHexagon(ctx, buildHexagon(surroundingHexStarts[i]));
       }
     }
 
-    const routes = generateRoutes(routeTails, covered, boundaries, ctx);
-    covered.push(...boundaries);
+    const routes = generateRoutes(routeTails, covered, boundaries);
 
-    let validBranchTails = calculateValidBranchPaths(
-      routes,
-      covered,
-      boundaries
+    let validBranchTails;
+    do {
+      validBranchTails = calculateValidBranchPaths(routes, covered, boundaries);
+      routes.push(...generateRoutes(validBranchTails, covered, boundaries));
+    } while (validBranchTails.length > 0);
+
+    drawHexagon(ctx, buildHexagon(centreHexStart));
+    routes.forEach((route) =>
+      route.forEach((hexStart) => drawHexagon(ctx, buildHexagon(hexStart)))
     );
   }
 
