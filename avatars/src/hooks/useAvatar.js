@@ -87,7 +87,7 @@ export default function useAvatar({ canvasRef }) {
     return boundaries;
   }
 
-  function drawHexagon(ctx, hexagon) {
+  function drawHexagon(ctx, hexagon, colour = "black") {
     ctx.beginPath();
     ctx.moveTo(hexagon[0].x, hexagon[0].y);
 
@@ -100,6 +100,7 @@ export default function useAvatar({ canvasRef }) {
     });
 
     ctx.lineTo(hexagon[0].x, hexagon[0].y);
+    ctx.strokeStyle = colour;
     ctx.stroke();
   }
 
@@ -143,7 +144,7 @@ export default function useAvatar({ canvasRef }) {
         .filter(
           (firstLayerHexStart) => !hexInCollection(firstLayerHexStart, covered)
         )
-        // filter out hexes adjacent to more than one other hex
+        // filter out hexes adjacent to more than one other covered hex
         .filter(
           (firstLayerHexStart) =>
             getSurroundingHexStarts(firstLayerHexStart).filter(
@@ -151,7 +152,7 @@ export default function useAvatar({ canvasRef }) {
                 hexInCollection(secondLayerHexStart, covered)
             ).length === 1
         )
-        // filter out hexes adjacent to a boundary
+        // filter out hexes on a boundary
         .filter(
           (firstLayerHexStart) =>
             !hexInCollection(firstLayerHexStart, boundaries)
@@ -166,16 +167,22 @@ export default function useAvatar({ canvasRef }) {
     );
 
     while (routeTails.length > 0) {
-      validSurroundingRoutePaths.forEach((potentialNextPaths, index) => {
-        const randomNextPathIndex = Math.floor(
-          Math.random() * Math.floor(potentialNextPaths.length)
-        );
-        const selectedStart = potentialNextPaths[randomNextPathIndex];
+      for (let i = 0; i < validSurroundingRoutePaths.length; i++) {
+        if (validSurroundingRoutePaths[i].length === 0) {
+          routeTails.splice(i, 1);
+          continue;
+        }
 
-        routes[index].push(selectedStart);
+        const randomNextPathIndex = Math.floor(
+          Math.random() * Math.floor(validSurroundingRoutePaths[i].length)
+        );
+        const selectedStart =
+          validSurroundingRoutePaths[i][randomNextPathIndex];
+
+        routes[i].push(selectedStart);
         covered.push(selectedStart);
-        routeTails[index] = selectedStart;
-      });
+        routeTails[i] = selectedStart;
+      }
 
       routeTails.forEach((tail) => {
         drawHexagon(ctx, buildHexagon(tail));
@@ -199,6 +206,16 @@ export default function useAvatar({ canvasRef }) {
     }
 
     return routes;
+  }
+
+  function calculateValidBranchPaths(routes, covered, boundaries) {
+    return routes
+      .reduce((acc, current) => [...acc, ...current], [])
+      .filter(
+        (hexStart) =>
+          getValidSurroundingRoutePaths(hexStart, covered, boundaries).length >
+          0
+      );
   }
 
   function generate() {
@@ -238,25 +255,13 @@ export default function useAvatar({ canvasRef }) {
     }
 
     const routes = generateRoutes(routeTails, covered, boundaries, ctx);
+    covered.push(...boundaries);
 
-    const validBranchTails = routes
-      .reduce((acc, current) => [...acc, ...current], [])
-      .filter(
-        (hexStart) =>
-          getValidSurroundingRoutePaths(hexStart, covered, boundaries).length >
-          0
-      );
-
-    // console.log("cheese", validBranchTails);
-    // const branchRoutes = validBranchTails.map((tail) =>
-    //   generateRoutes([tail], covered, boundaries, ctx)
-    // );
-
-    // routes.forEach((route) => {
-    //   route.forEach((hex) => {
-    //     drawHexagon(ctx, buildHexagon(hex));
-    //   });
-    // });
+    let validBranchTails = calculateValidBranchPaths(
+      routes,
+      covered,
+      boundaries
+    );
   }
 
   return {
