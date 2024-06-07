@@ -87,25 +87,6 @@ export default function useAvatar({ canvasRef }) {
     return boundaries;
   }
 
-  function drawHexagon(ctx, hexagon, colour = "black") {
-    ctx.beginPath();
-    ctx.moveTo(hexagon[0].x, hexagon[0].y);
-
-    hexagon.forEach((point, index) => {
-      if (index === 0) {
-        ctx.moveTo(point.x, point.y);
-      } else {
-        ctx.lineTo(point.x, point.y);
-      }
-    });
-
-    ctx.lineTo(hexagon[0].x, hexagon[0].y);
-    ctx.strokeStyle = colour;
-    ctx.stroke();
-    ctx.fillStyle = colour;
-    ctx.fill();
-  }
-
   function getSurroundingHexStarts(hexStart) {
     return [
       { x: hexStart.x, y: hexStart.y - 2 * hexDims.apothem },
@@ -222,6 +203,35 @@ export default function useAvatar({ canvasRef }) {
       );
   }
 
+  function drawHexagon(ctx, hexagon, colour = "black") {
+    ctx.beginPath();
+    ctx.moveTo(hexagon[0].x, hexagon[0].y);
+
+    hexagon.forEach((point, index) => {
+      if (index === 0) {
+        ctx.moveTo(point.x, point.y);
+      } else {
+        ctx.lineTo(point.x, point.y);
+      }
+    });
+
+    ctx.lineTo(hexagon[0].x, hexagon[0].y);
+    ctx.strokeStyle = colour;
+    ctx.stroke();
+    ctx.fillStyle = colour;
+    ctx.fill();
+  }
+
+  function drawGenerated(ctx, centreHexStart, routes, boundaries) {
+    drawHexagon(ctx, buildHexagon(centreHexStart));
+    routes.forEach((route) =>
+      route.forEach((hexStart) => drawHexagon(ctx, buildHexagon(hexStart)))
+    );
+    boundaries.forEach((boundary) => {
+      drawHexagon(ctx, buildHexagon(boundary));
+    });
+  }
+
   function generate() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext("2d");
@@ -233,19 +243,15 @@ export default function useAvatar({ canvasRef }) {
     ctx.fillStyle = "#000000";
 
     const boundaries = getBoundaries(xCentre, yCentre);
-    boundaries.forEach((boundary) => {
-      drawHexagon(ctx, buildHexagon(boundary));
-    });
 
     const centreHexStart = {
       x: xCentre - hexDims.sideLength / 2,
       y: yCentre - hexDims.apothem,
     };
 
-    const surroundingHexStarts = getSurroundingHexStarts(centreHexStart);
-
     const covered = [centreHexStart];
 
+    const surroundingHexStarts = getSurroundingHexStarts(centreHexStart);
     const oneOrZero = Math.round(Math.random());
 
     const routeTails = [];
@@ -264,10 +270,7 @@ export default function useAvatar({ canvasRef }) {
       routes.push(...generateRoutes(validBranchTails, covered, boundaries));
     } while (validBranchTails.length > 0);
 
-    drawHexagon(ctx, buildHexagon(centreHexStart));
-    routes.forEach((route) =>
-      route.forEach((hexStart) => drawHexagon(ctx, buildHexagon(hexStart)))
-    );
+    drawGenerated(ctx, centreHexStart, routes, boundaries);
   }
 
   return {
